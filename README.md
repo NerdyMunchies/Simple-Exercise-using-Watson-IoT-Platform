@@ -17,19 +17,31 @@ The connecting of the described components is made possible and simple through t
 ## Architecture overview
 An architecture overview of the system can be found below.
 
-![architecture_overview]()
+![architecture_overview](images/overview.png)
 
 
 ## Connecting connections to the Raspberry Pi
 
 For the connection between the Raspberry Pi and the other components, check the schematic below.
 
-![rpi_connections]()
+![rpi_connections](images/sketch.png)
 
+
+## Setting up things on the Raspberry Pi
 You will find that there is a file called *rpi_iotf.py*, which you will need to copy onto the Raspberry Pi.
+### Importing dht11 in rpi_iotf.py file
+You also need to download a *dht11.py* file and make sure both *dht11.py* and *rpi_iotf.py* files are in the same directory. To do so, input below command to download it:
+```sh
+sudo wget http://osoyoo.com/driver/dht11.py
+```
+The file is then imported in *dht11.py*, which will allow you get it humidity and temperature sensor data.
 
-**Import iotf and dht11 files - To be added**
-
+### Importing the Python Client for IBM Watson IoT Platform
+To install the latest version of the library, input below command:
+```sh
+pip install ibmiotf
+```
+The file is then imported in *dht11.py*, which allow us to publish events to and send commands from **Watson IoT Platform** service.
 
 ## Pre-requisite
 An IBM Cloud account - A lite account, which is a free of charge account that doesn’t expire, can be created through going to [IBM Cloud]().
@@ -61,38 +73,41 @@ In order to communicate with **Internet of Things Platform** service, you will n
 
 **To be modified**
 ```python
-organization = #add organisation from the IoT platform service
-deviceType = #add device type from the IoT platform service
-deviceId = #add device ID from the IoT platform service
-appId = deviceId + "_receiver"
-authMethod = "token"
-authToken = #add authentication token from the IoT platform service
+import ibmiotf.device
 
-def myOnPublishCallback():
-    print "Confirmed event received by IoTF\n"
+oorganization = "" #add organisation from the IoT platform service
+deviceType = "" #add device type from the IoT platform service
+deviceId = "" #add device ID from the IoT platform service
+authMethod = "token"
+authToken = "" #add authentication token from the IoT platform service
 
 # Initialize the device client.
 deviceOptions = {"org": organization, "type": deviceType, "id": deviceId, "auth-method": authMethod, "auth-token": authToken}
 client = ibmiotf.device.Client(deviceOptions)
-print "init successful"
+print("init successful")
+
+def myOnPublishCallback():
+    print("Confirmed event received by IoTF")
 
 # Connect and send a datapoint 
 def send(data):
     success = client.publishEvent("data", "json", data, qos=0, on_publish=myOnPublishCallback)
     if not success:
-        print "Not connected to IoTF"
+        print("Not connected to IoTF")
+
+# get a command from Watson IoT Platform
+def myCommandCallback(cmd):
+    print("Command received: %s\n" % cmd.data)
+
 
 client.connect()
-send({'IR':INR, "US": USS, "X": X1, "Y": Y1, "Z": Z1 })
+send({"temp":temp, "hum": hum})
+client.commandCallback = myCommandCallback
 client.disconnect()
 ```
 
 ### Step 2: Setting up Cloudant NoSQL database
-If we click on <APP-NAME>-cloudantNoSQLDB, it will take us to the page with the details about the Cloudant NoSQL DB service. Click on **Service Credentials** on the menu seen on the left hand-side.  If no service credentials are found, create a new credential. Go to the newly created credential and select **View credentials**. Then, copy both the content into a notepad for later use. The username and password will be used for authentication to allow us to communicate with the database.
-
-![Alt Text]()
-
-Next, go to **Manage** and then click on **Launch**. This will launch an interface through which we can interact with the **Cloudant NoSQL DB**. Click on the **Databases** from the menu available on the left. By default, a database named nodered can be found, which we are not going to touch. Now, click on **Create Database** at the top of the page to create a new Database and give it a name (here, we called it iotdb) and click **create**. Here, we will be saving any data we will be receiving. Whenever we want to store something, we store that data in a document in a NoSQL database.
+If we click on <APP-NAME>-cloudantNoSQLDB, it will take us to the page with the details about the Cloudant NoSQL DB service. Go to **Manage** and then click on **Launch**. This will launch an interface through which we can interact with the **Cloudant NoSQL DB**. Click on the **Databases** from the menu available on the left. By default, a database named nodered can be found, which we are not going to touch. Now, click on **Create Database** at the top of the page to create a new Database and give it a name (here, we called it *iotdb*) and click **create**. Here, we will be saving any data we will be receiving. Whenever we want to store something, we store that data in a document in a NoSQL database.
 
 ![Alt Text]()
 
@@ -102,11 +117,20 @@ Go back to the dashboard and click on the application you created earlier. In or
 
 ![Alt Text]()
 
-A new Node-RED flow appears containing nodes representing a sample application. Select all the nodes and delete them as we will be importing our own flow. In this repository, go to the file called **Node-REDflow_Partial.json** and copy its content. In the Node-RED editor, go to the hamburger menu at the top right of the page after which select **Import Clipboard**. Paste the content of the JSON file and click on **Import**. This will mostly import the calculation part of the application and will be missing some nodes that we will be adding.
+A new Node-RED flow appears containing nodes representing a sample application. Select all the nodes and delete them as we will be importing our own flow. There are nodes that we will be working with, whose module we need to install. This can be achieved by going to the hamburger menu again and clicking on **Manage palette**. In the **Install** tab, we will search for **node-red-dashboard** module and install it. If look at the node type menu on the left hand-side, we will notice that a number of nodes have been added under the **dashboard** node type.
 
-We will notice that we have an error saying that we imported unrecognized types. These are related to the dashboard nodes that we will be working with shortly. To work with these nodes, we need to install a module, which can be achieved by going to the hamburger menu again and clicking on **Manage palette**. In the **Install** tab, we will search for **node-red-dashboard** module and install it. If look at the node type menu on the left hand-side, we will notice that a number of nodes have been added under the **dashboard** node type.
+In this repository, go to the file called *Node-REDflow_Full.json* and copy its content. In the Node-RED editor, go to the hamburger menu at the top right of the page after which select **Import Clipboard**. Paste the content of the JSON file and click on **Import**.
 
-We will add an **ibmiot** node, which can be seen under **input**, to allow us to consume any data received by the **IoT Platform** service. By double-clicking on the node, we can change its properties and set the **Authentication** to **Bluemix Service**, **Device Type** and **Device id** to the device type and device id that we defined in the IoT Platform service. We will connect it to a **debug node**, which can be found under **output** node type. Before we continue, we will check if our application can receive any data from the Raspberry PI, which should show as a JSON object under the **debug** tab on the right.
+The **ibmiot in** node found in the flow allows us to consume any data received by the **IoT Platform** service. By double-clicking on the node, we can change its properties and set the **Authentication** to **Bluemix Service**, **Device Type** and **Device id** to the device type and device id that we defined in the IoT Platform service. Keep **Input Type** as **Device Event**. We will connect it to a **debug node**, which can be found under **output** node type. Before we continue, we will check if our application can receive any data from the Raspberry PI, which should show as a JSON object under the **debug** tab on the right.
+
+The **cloudant out** node found in the flow is used to store the temperature and humidity sensor data. Double-clicking on the node and change **Service** to the name of your **Cloudant NoSQL DB** that was created earlier. Moreover, input the name of the database (in our case, it is *iotdb*) in the field corresponding to **Database** and keep the **Operation** as **insert**.
+
+The **ibmiot out** node found in the flow allows us to send an commands from the **IoT Platform** service. By double-clicking on the node, we can change its properties and set the **Authentication** to **Bluemix Service**, **Device Type** and **Device id** to the device type and device id that we defined in the IoT Platform service. Keep **Output Type** as **Device Command**. Insert *cmd* as the **Command Type** and *{"test":0}* as the **Data**, which is overwritten by the payload sent by the function node called *Alert*.
 
 ![config_ibmiot]()
 
+Now that all the operational nodes are done, it is time to create and customize the dashboard, which provides the User Interface (UI) part of the application. On the right hand-side of the page, click on the dashboard tab. We will notice that there are 3 tabs, each used to change the look and feel of the UI.
+
+The node used as part of the dashboard in the flow is the **chart** node. This is the node that will allow us to visualize the change in temperature and humidity over time.
+
+Finally, deploy and you are done!!
