@@ -17,14 +17,14 @@ The connecting of the described components is made possible and simple through t
 ## Architecture overview
 An architecture overview of the system can be found below.
 
-![architecture_overview](images/overview.png)
+![overview](https://user-images.githubusercontent.com/10744356/37001744-601d8a26-207c-11e8-812e-6cdad43f9fc3.png)
 
 
 ## Connecting connections to the Raspberry Pi
 
 For the connection between the Raspberry Pi and the other components, check the schematic below.
 
-![rpi_connections](images/sketch.png)
+![sketch](https://user-images.githubusercontent.com/10744356/37001743-5ff38258-207c-11e8-902c-f8d5b6cadbe8.png)
 
 
 ## Setting up things on the Raspberry Pi
