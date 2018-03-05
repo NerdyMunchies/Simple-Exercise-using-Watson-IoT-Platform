@@ -1,0 +1,251 @@
+[
+    {
+        "id": "5c11e11b.a3a718",
+        "type": "debug",
+        "z": "8f8c2b69.234b48",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 696.2000122070312,
+        "y": 429,
+        "wires": []
+    },
+    {
+        "id": "1ae84b93.6006c4",
+        "type": "function",
+        "z": "8f8c2b69.234b48",
+        "name": "Alert",
+        "func": "temp = msg.payload.temp\nhum = msg.payload.hum\n\nmsg.payload = {}\nif (hum >= 85)\n{\n    msg.payload.led_on = 1\n}\nelse\n{\n    msg.payload.led_on = 0;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 499.50001525878906,
+        "y": 361.80006408691406,
+        "wires": [
+            [
+                "5c11e11b.a3a718",
+                "8cd5bcc.0855dc"
+            ]
+        ]
+    },
+    {
+        "id": "98b75ef6.825538",
+        "type": "function",
+        "z": "8f8c2b69.234b48",
+        "name": "Display Temperature",
+        "func": "temp = msg.payload.temp;\n\nmsg = {topic:\"Temperature\", payload:temp};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 551.2000122070312,
+        "y": 215.99996948242188,
+        "wires": [
+            [
+                "79cc94c2.210064"
+            ]
+        ]
+    },
+    {
+        "id": "54c321f1.5b9298",
+        "type": "inject",
+        "z": "8f8c2b69.234b48",
+        "name": "clear",
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 548.7000732421875,
+        "y": 144.99996948242188,
+        "wires": [
+            [
+                "79cc94c2.210064"
+            ]
+        ]
+    },
+    {
+        "id": "38a0fd8f.bfccaa",
+        "type": "function",
+        "z": "8f8c2b69.234b48",
+        "name": "Display Humidity",
+        "func": "hum = msg.payload.hum;\n\nmsg = {topic:\"Humidity\", payload:hum};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 542.6000061035156,
+        "y": 287.4000244140625,
+        "wires": [
+            [
+                "7adf5d44.4a0fd4"
+            ]
+        ]
+    },
+    {
+        "id": "79cc94c2.210064",
+        "type": "ui_chart",
+        "z": "8f8c2b69.234b48",
+        "name": "",
+        "group": "d37bc6f9.3c09c8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Temperature",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 800.5,
+        "y": 215.79998779296875,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7adf5d44.4a0fd4",
+        "type": "ui_chart",
+        "z": "8f8c2b69.234b48",
+        "name": "",
+        "group": "d37bc6f9.3c09c8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Humidity",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 787.6000061035156,
+        "y": 287.1999969482422,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "38c6c8be.84856",
+        "type": "ibmiot in",
+        "z": "8f8c2b69.234b48",
+        "authentication": "quickstart",
+        "apiKey": "",
+        "inputType": "evt",
+        "logicalInterfaceId": "",
+        "ruleId": "",
+        "deviceId": "",
+        "applicationId": "",
+        "deviceType": "+",
+        "eventType": "+",
+        "commandType": "",
+        "format": "json",
+        "name": "IBM IoT",
+        "service": "quickstart",
+        "allDevices": "",
+        "allApplications": "",
+        "allDeviceTypes": true,
+        "allEvents": true,
+        "allCommands": "",
+        "allFormats": "",
+        "qos": 0,
+        "x": 294.3000183105469,
+        "y": 212.99998474121094,
+        "wires": [
+            [
+                "98b75ef6.825538",
+                "38a0fd8f.bfccaa",
+                "1ae84b93.6006c4",
+                "2d639c38.d8022c"
+            ]
+        ]
+    },
+    {
+        "id": "8cd5bcc.0855dc",
+        "type": "ibmiot out",
+        "z": "8f8c2b69.234b48",
+        "authentication": "quickstart",
+        "outputType": "",
+        "deviceId": "",
+        "deviceType": "",
+        "eventCommandType": "",
+        "format": "",
+        "data": "",
+        "qos": 0,
+        "name": "IBM IoT",
+        "service": "",
+        "x": 690.2999877929688,
+        "y": 363,
+        "wires": []
+    },
+    {
+        "id": "2d639c38.d8022c",
+        "type": "cloudant out",
+        "z": "8f8c2b69.234b48",
+        "name": "",
+        "database": "",
+        "service": "",
+        "payonly": false,
+        "operation": "insert",
+        "x": 507.29998779296875,
+        "y": 431.20001220703125,
+        "wires": []
+    },
+    {
+        "id": "d37bc6f9.3c09c8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Default",
+        "tab": "d5d65a4b.82782",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "d5d65a4b.82782",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Home",
+        "icon": "dashboard"
+    }
+]
